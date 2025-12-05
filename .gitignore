@@ -79,3 +79,5 @@ Thumbs.db
 tmp/
 temp/
 *.tmp
+
+.secrets
