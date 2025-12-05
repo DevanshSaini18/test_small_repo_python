@@ -1,0 +1,39 @@
+# Automated Repository Summary
+
+Purpose
+- Enterprise Todo Platform is a production-ready, SaaS-ready FastAPI application designed for multi-tenant organizations with enterprise features and a monetization strategy aimed at $10M ARR. It provides team-oriented task management, RBAC, analytics, integrations, and operational tooling suited for scaling.
+
+Key features
+- Multi-tenancy: organizations, subscription tiers (Free → Enterprise), teams, roles (Owner/Admin/Member/Viewer).
+- Authentication & security: JWT auth, API keys, bcrypt password hashing, role-based access control, request logging and global error handling.
+- Advanced todo management: priorities, statuses, due dates/overdue tracking, time estimates vs actuals, subtasks, multi-user assignments, tags.
+- Collaboration: real-time comments, activity logs (audit trails); user mentions and attachments planned.
+- Analytics & monitoring: item status/priority stats, completion rates/times, usage metrics (requests, response times, errors), overdue monitoring.
+- Integrations & API: RESTful API with OpenAPI docs, webhooks, API key management, event-driven architecture.
+- Enterprise readiness: health checks, CORS, usage tracking per org, deployment-ready (Docker, cloud).
+
+Installation
+- Prerequisites: Python 3.9+, Poetry (recommended) or pip.
+- Clone and install:
+  - git clone <repo>
+  - cd test_small_repo_python
+  - poetry install
+  - or pip install -r requirements.txt
+- Run:
+  - Development: uvicorn main:app --reload
+  - Production: uvicorn main:app --host 0.0.0.0 --port 8000 --workers 4
+
+Docker
+- Dockerfile provided. Example:
+  - docker build -t enterprise-todo .
+  - docker run -p 8000:8000 enterprise-todo
+
+Usage
+- API base: http://localhost:8000/api/v1
+- Docs: http://localhost:8000/docs (Swagger) and /redoc
+- Health check: /health
+- Quick endpoints: create organization, register user, login to obtain JWT, create todo item, fetch analytics (examples in README with curl).
+
+Project layout: app/ (auth, models, routes, services), docs/, main.py, pyproject.toml. Licensed MIT. Contributing encouraged.
+
+*This summary was automatically generated using OpenAI.*
