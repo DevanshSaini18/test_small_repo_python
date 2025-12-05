@@ -1,0 +1,44 @@
+# Automated Repository Summary
+
+Purpose
+- Enterprise Todo Platform is a production-ready, API-first SaaS todo/project platform built to scale to enterprise customers and target a $10M ARR. It provides multi-tenancy, team collaboration, RBAC, analytics, and integration capabilities aimed at organizations needing secure, auditable task management.
+
+Key features
+- Multi-tenancy & billing: organizations with subscription tiers (Free, Starter, Professional, Enterprise), teams, roles (Owner/Admin/Member/Viewer).
+- Authentication & security: JWT auth, API keys, role-based access control, bcrypt password hashing, global exception handling, request logging and monitoring.
+- Advanced task management: priorities, statuses, due dates/overdue tracking, time tracking (estimated vs actual), subtasks, multi-user assignments, tags.
+- Collaboration & audit: real-time comments, activity logs; mentions and file attachments planned.
+- Analytics & insights: status/priority/team statistics, completion rates, average completion time, usage metrics, overdue monitoring.
+- Integrations: webhooks, REST API with OpenAPI docs, API key management, event-driven architecture.
+- Enterprise readiness: health checks, CORS, usage tracking, monitoring and logging.
+- Monetization model: tiered subscription pricing with limits/features per tier and a path-to-market strategy.
+
+Installation
+- Prerequisites: Python 3.9+, Poetry (recommended) or pip.
+- Clone and install:
+  - git clone <repo>; cd test_small_repo_python
+  - poetry install
+  - or pip install -r requirements.txt
+- Docker: supplied Dockerfile; build and run:
+  - docker build -t enterprise-todo .
+  - docker run -p 8000:8000 enterprise-todo
+
+Usage
+- Run locally:
+  - Development: uvicorn main:app --reload
+  - Production: uvicorn main:app --host 0.0.0.0 --port 8000 --workers 4
+- API endpoints (base URL: http://localhost:8000/api/v1):
+  - Interactive docs: /docs (Swagger), /redoc
+  - Health: /health
+  - Example flows: create organization, register user, login to obtain JWT, create todo item, fetch analytics (examples provided as curl commands in README).
+- Project layout: app/ (auth, models, routes, services), docs/, main.py, pyproject.toml.
+
+Tech stack & testing
+- FastAPI, Python, SQLAlchemy, Pydantic, python-jose (JWT), bcrypt. Docker-ready and cloud-deployable (AWS/GCP/Azure). Tests and coverage are scaffolded (pytest).
+
+Contributing & license
+- Contributions via fork → branch → PR. Licensed under MIT.
+
+This summary highlights purpose, principal capabilities, quick install/run steps, and how to interact with the API.
+
+*This summary was automatically generated using OpenAI.*
