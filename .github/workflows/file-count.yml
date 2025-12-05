@@ -13,8 +13,6 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
-        with:
-          persist-credentials: false
 
       - name: Run file-count action
         uses: Nemo-docs/autodocs@main
