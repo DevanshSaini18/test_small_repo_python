@@ -16,3 +16,5 @@ jobs:
 
       - name: Run file-count action
         uses: Nemo-docs/autodocs@main
+        with:
+          github_token: ${{ github.token }}
