@@ -490,6 +490,37 @@ Defines all REST API endpoints using FastAPI routers.
 
 ---
 
+<!-- START: Item Listing and Search -->
+### 2.a Item Listing and Search
+
+*Linked Files:*
+- app/routes.py (list_items endpoint)
+- app/services.py (get_items function)
+- app/models.py (Item model)
+
+*Overview:*
+A new optional search parameter has been added to the items listing endpoint to allow case-insensitive partial matching against item title or description.
+
+*Steps:*
+1. Client sends GET request to /items with optional query parameters, including:
+   - search: text to search within item title or description
+   - status, priority, assigned_to, team_id, skip, limit
+2. Routes layer accepts the `search` Query parameter (description: "Search text to filter items by title or description")
+3. Routes layer passes the search value to the services layer as `search_text`
+4. Services layer (get_items) checks for `search_text` and, if present, builds a search pattern `%{search_text}%`
+5. Services layer applies a case-insensitive filter using SQLAlchemy ilike on Item.title and Item.description combined with OR
+6. Other filters (status, priority, assignee, pagination) are applied as before
+7. Services layer returns the filtered, paginated list of items
+8. Routes layer returns the list to the client (200 OK)
+
+*Notes:*
+- The search is a partial, case-insensitive match against title OR description.
+- Pagination (skip/limit) still applies after filtering.
+
+<!-- END: Item Listing and Search -->
+
+---
+
 <!-- START: Item Update Flow -->
 ### 3. Item Update with Change Tracking
 
@@ -566,7 +597,6 @@ Defines all REST API endpoints using FastAPI routers.
    - avg_completion_time_hours
 
 <!-- END: Analytics Data Aggregation -->
-
 <!-- END: Data Flow -->
 
 ---
