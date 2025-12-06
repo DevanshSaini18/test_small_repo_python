@@ -1,0 +1,31 @@
+# Automated Repository Summary
+
+Purpose
+- Enterprise Todo Platform is a production-ready, API-first SaaS to manage tasks for organizations with multi-tenancy and enterprise features. It’s built to scale and monetize (targeting a $10M ARR model) with subscription tiers, RBAC, monitoring and integrations.
+
+Key features
+- Multi-tenancy: organizations, teams, subscription tiers (Free → Enterprise), roles (Owner/Admin/Member/Viewer).
+- Authentication & security: JWT auth, API keys, bcrypt password hashing, role-based access control, audit logs.
+- Advanced todo management: priorities, statuses, due dates/overdue tracking, time tracking (estimated vs actual), subtasks, multi-user assignments, tags.
+- Collaboration: real-time comments, activity logs, (user mentions & attachments planned).
+- Analytics & monitoring: item statistics, completion rates, average completion time, usage metrics, overdue monitoring.
+- Integrations & API: webhook support, RESTful API with OpenAPI/Swagger docs, event-driven architecture, request logging/health checks and global exception handling.
+- Enterprise readiness: CORS, usage tracking per org, production deploy patterns (Docker, cloud-ready).
+
+Installation
+- Prereqs: Python 3.9+, Poetry recommended (or pip).
+- Clone repo and install dependencies: use poetry install or pip install -r requirements.txt.
+- Run dev server: uvicorn main:app --reload
+- Run production: uvicorn main:app --host 0.0.0.0 --port 8000 --workers 4
+- Docker: official Dockerfile included; build and run with docker build -t enterprise-todo . and docker run -p 8000:8000 enterprise-todo
+
+Usage
+- API base: http://localhost:8000/api/v1
+- Interactive docs: /docs (Swagger) and /redoc
+- Health: /health
+- Typical flows: create organization, register user, login to get token, create/search todo items, retrieve analytics. Example endpoints: POST /organizations, POST /auth/register, POST /auth/login, POST /items, GET /analytics/items.
+
+Extras
+- Project structure follows FastAPI + SQLAlchemy + Pydantic conventions. Documentation and API reference are in docs/*. Tests and CI are planned; contributions via PRs are welcome. Licensed MIT.
+
+*This summary was automatically generated using OpenAI.*
