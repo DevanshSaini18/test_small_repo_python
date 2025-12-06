@@ -134,6 +134,7 @@ def get_items(
     status: Optional[ItemStatus] = None,
     priority: Optional[PriorityLevel] = None,
     assigned_to: Optional[int] = None,
+    search_text: Optional[str] = None,
     skip: int = 0,
     limit: int = 100
 ) -> List[Item]:
@@ -148,6 +149,14 @@ def get_items(
         query = query.filter(Item.priority == priority)
     if assigned_to:
         query = query.join(Item.assignees).filter(User.id == assigned_to)
+    if search_text:
+        search_pattern = f"%{search_text}%"
+        query = query.filter(
+            or_(
+                Item.title.ilike(search_pattern),
+                Item.description.ilike(search_pattern)
+            )
+        )
     
     return query.order_by(Item.created_at.desc()).offset(skip).limit(limit).all()
 
