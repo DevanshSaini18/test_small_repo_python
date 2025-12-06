@@ -440,7 +440,6 @@ Defines all REST API endpoints using FastAPI routers.
 - app/auth.py
 - app/models.py
 
-<!-- START: User Authentication Flow -->
 ### 1. User Authentication Flow
 
 *Linked Files:*
@@ -460,11 +459,8 @@ Defines all REST API endpoints using FastAPI routers.
 8. Server decodes JWT token and retrieves user from database
 9. Server returns protected resources
 
-<!-- END: User Authentication Flow -->
-
 ---
 
-<!-- START: Item Creation Flow -->
 ### 2. Item Creation Flow
 
 *Linked Files:*
@@ -486,11 +482,8 @@ Defines all REST API endpoints using FastAPI routers.
 10. Services layer returns created item
 11. Routes layer returns 201 Created response with item object
 
-<!-- END: Item Creation Flow -->
-
 ---
 
-<!-- START: Item Update Flow -->
 ### 3. Item Update with Change Tracking
 
 *Linked Files:*
@@ -509,11 +502,8 @@ Defines all REST API endpoints using FastAPI routers.
 8. Server logs activity with detailed change history (field: {from, to})
 9. Server returns updated item with 200 OK
 
-<!-- END: Item Update Flow -->
-
 ---
 
-<!-- START: Multi-Tenancy Data Isolation -->
 ### 4. Multi-Tenancy Data Isolation
 
 *Linked Files:*
@@ -534,11 +524,8 @@ Defines all REST API endpoints using FastAPI routers.
    - Webhooks WHERE organization_id = user's org
 7. Users from different organizations can never access each other's data
 
-<!-- END: Multi-Tenancy Data Isolation -->
-
 ---
 
-<!-- START: Analytics Data Aggregation -->
 ### 5. Analytics Data Aggregation
 
 *Linked Files:*
@@ -565,8 +552,26 @@ Defines all REST API endpoints using FastAPI routers.
    - completed_this_week count
    - avg_completion_time_hours
 
-<!-- END: Analytics Data Aggregation -->
+---
 
+### 6. Item Listing with Search Functionality
+
+*Linked Files:*
+- app/routes.py (list_items endpoint)
+- app/services.py (get_items function)
+
+*Steps:*
+1. Client sends GET request to /items with optional filters including search text
+2. Routes layer verifies JWT token (get_current_user dependency)
+3. Routes layer retrieves organization (get_current_organization dependency)
+4. Routes layer validates request schema using Pydantic
+5. Routes layer calls service function with search text
+6. Services layer filters items based on title or description using the provided search text
+7. Services layer returns filtered item list
+8. Routes layer returns 200 OK response with item list
+
+*Note:*
+- The item listing now supports filtering by search text, allowing clients to find items by title or description.
 <!-- END: Data Flow -->
 
 ---
