@@ -1,0 +1,34 @@
+# Automated Repository Summary
+
+Purpose
+- Enterprise Todo Platform is a production-ready, API-first SaaS todo/task management system designed for multi-tenant organizations with enterprise features and a monetization path targeting $10M ARR. It emphasizes scalability, security, collaboration, analytics, and integrations for teams and businesses.
+
+Key features
+- Multi-tenancy: organizations, subscription tiers (Free/Starter/Professional/Enterprise), teams, roles (Owner/Admin/Member/Viewer).
+- Authentication & security: JWT auth, API keys, RBAC, bcrypt password hashing, global exception handling, request logging and monitoring.
+- Advanced todo management: priorities, statuses, due dates/overdue tracking, time tracking (estimated vs actual), subtasks, multi-user assignments, tags.
+- Collaboration: real-time comments, activity logs (audit trails); mentions and file attachments planned.
+- Analytics & integrations: item and usage analytics, completion metrics, overdue monitoring, webhooks, REST API with OpenAPI/Swagger docs.
+- Enterprise readiness: health checks, CORS, usage tracking per org, event-driven patterns.
+- Tech stack: FastAPI, Python 3.9+, SQLAlchemy, Pydantic, python-jose, bcrypt; Docker-ready.
+
+Installation
+- Prereqs: Python 3.9+, Poetry (recommended) or pip.
+- Quick install:
+  - git clone <repo>; cd repo
+  - poetry install  (or pip install -r requirements.txt)
+- Docker:
+  - Build: docker build -t enterprise-todo .
+  - Run: docker run -p 8000:8000 enterprise-todo
+
+Usage
+- Run dev: uvicorn main:app --reload
+- Run prod: uvicorn main:app --host 0.0.0.0 --port 8000 --workers 4
+- API base: http://localhost:8000/api/v1
+- Docs: /docs (Swagger), /redoc, Health: /health
+- Example flows: create organization, register user, login to receive JWT, create/search todo items, query analytics (curl examples provided in README).
+
+Additional
+- Project layout (app/, docs/, main.py), full docs in docs/index.md and api-reference.md, testing placeholders, MIT license, and contribution guidelines included.
+
+*This summary was automatically generated using OpenAI.*
