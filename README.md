@@ -179,7 +179,13 @@ curl -X POST http://localhost:8000/api/v1/items \
   }'
 ```
 
-### 5. Get Analytics
+### 5. Search Items
+```bash
+curl -X GET "http://localhost:8000/api/v1/items?search_text=dashboard&status=in_progress" \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+
+### 6. Get Analytics
 ```bash
 curl -X GET http://localhost:8000/api/v1/analytics/items \
   -H "Authorization: Bearer YOUR_TOKEN"

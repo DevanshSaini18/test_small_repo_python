@@ -130,7 +130,7 @@ Authorization: Bearer <token>
 
 #### List Items
 ```http
-GET /items?team_id=1&status=in_progress&priority=high&assigned_to=2&skip=0&limit=50
+GET /items?team_id=1&status=in_progress&priority=high&assigned_to=2&search_text=bug&skip=0&limit=50
 Authorization: Bearer <token>
 ```
 
@@ -139,6 +139,7 @@ Authorization: Bearer <token>
 - `status` (optional): todo, in_progress, in_review, done, archived
 - `priority` (optional): low, medium, high, urgent
 - `assigned_to` (optional): User ID
+- `search_text` (optional): Search items by title or description (case-insensitive)
 - `skip` (optional): Pagination offset (default: 0)
 - `limit` (optional): Results per page (default: 100, max: 1000)
 
