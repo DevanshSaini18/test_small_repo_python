@@ -160,15 +160,14 @@ def list_items(
     status: Optional[ItemStatus] = Query(None),
     priority: Optional[PriorityLevel] = Query(None),
     assigned_to: Optional[int] = Query(None),
-    search_text: Optional[str] = Query(None, description="Search items by title or description"),
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=1000),
     current_user: User = Depends(get_current_active_user),
     org: Organization = Depends(get_current_organization),
     db: Session = Depends(get_db)
 ):
-    """List items with optional filters and search."""
-    return get_items(db, org.id, team_id, status, priority, assigned_to, search_text, skip, limit)
+    """List items with optional filters."""
+    return get_items(db, org.id, team_id, status, priority, assigned_to, skip, limit)
 
 @router.put("/items/{item_id}", response_model=ItemRead)
 def update_existing_item(
