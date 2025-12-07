@@ -7,13 +7,14 @@ This document provides a comprehensive architectural overview of the *Enterprise
 <!-- START: High-Level System Overview -->
 ## 2.1 High-Level System Overview
 
-*Linked Files:*
+<!-- LINKED CODE FILES START -->
 - main.py
 - app/__init__.py
 - app/database.py
 - docker-compose.yml
 - Dockerfile
 - requirements.txt
+<!-- LINKED CODE FILES END -->
 
 ### System Architecture
 
@@ -65,9 +66,10 @@ The application is organized into the following modules:
 <!-- START: Application Entry Point -->
 #### 1. *main.py* - Application Entry Point
 
-*Linked Files:*
+<!-- LINKED CODE FILES START -->
 - main.py
 
+<!-- LINKED CODE FILES END -->
 The main application file that initializes the FastAPI app and configures middleware.
 
 *Key Responsibilities:*
@@ -96,8 +98,9 @@ The main application file that initializes the FastAPI app and configures middle
 <!-- START: Database Configuration -->
 #### 2. *app/database.py* - Database Configuration
 
-*Linked Files:*
+<!-- LINKED CODE FILES START -->
 - app/database.py
+<!-- LINKED CODE FILES END -->
 
 Manages database connections and session lifecycle.
 
@@ -120,8 +123,9 @@ SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
 <!-- START: Data Models -->
 #### 3. *app/models.py* - Data Models (ORM)
 
-*Linked Files:*
+<!-- LINKED CODE FILES START -->
 - app/models.py
+<!-- LINKED CODE FILES END -->
 
 Defines the database schema using SQLAlchemy ORM models.
 
@@ -187,8 +191,9 @@ Defines the database schema using SQLAlchemy ORM models.
 <!-- START: Pydantic Schemas -->
 #### 4. *app/schemas.py* - Pydantic Schemas
 
-*Linked Files:*
+<!-- LINKED CODE FILES START -->
 - app/schemas.py
+<!-- LINKED CODE FILES END -->
 
 Defines request/response validation schemas using Pydantic.
 
@@ -211,8 +216,9 @@ Defines request/response validation schemas using Pydantic.
 <!-- START: Authentication Utilities -->
 #### 5. *app/auth.py* - Authentication Utilities
 
-*Linked Files:*
+<!-- LINKED CODE FILES START -->
 - app/auth.py
+<!-- LINKED CODE FILES END -->
 
 Provides authentication and security utilities.
 
@@ -245,10 +251,11 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24  # 24 hours
 <!-- START: FastAPI Dependencies -->
 #### 6. *app/dependencies.py* - FastAPI Dependencies
 
-*Linked Files:*
+<!-- LINKED CODE FILES START -->
 - app/dependencies.py
 - app/auth.py
 - app/models.py
+<!-- LINKED CODE FILES END -->
 
 Implements dependency injection for authentication and authorization.
 
@@ -292,11 +299,12 @@ Implements dependency injection for authentication and authorization.
 <!-- START: Business Logic Layer -->
 #### 7. *app/services.py* - Business Logic Layer
 
-*Linked Files:*
+<!-- LINKED CODE FILES START -->
 - app/services.py
 - app/models.py
 - app/schemas.py
 - app/auth.py
+<!-- LINKED CODE FILES END -->
 
 Contains all business logic and CRUD operations.
 
@@ -361,12 +369,13 @@ Contains all business logic and CRUD operations.
 <!-- START: API Endpoints -->
 #### 8. *app/routes.py* - API Endpoints
 
-*Linked Files:*
+<!-- LINKED CODE FILES START -->
 - app/routes.py
 - app/services.py
 - app/schemas.py
 - app/dependencies.py
 - app/models.py
+<!-- LINKED CODE FILES END -->
 
 Defines all REST API endpoints using FastAPI routers.
 
@@ -433,21 +442,23 @@ Defines all REST API endpoints using FastAPI routers.
 <!-- START: Data Flow -->
 ## 2.3 Data Flow
 
-*Linked Files:*
+<!-- LINKED CODE FILES START -->
 - app/routes.py
 - app/services.py
 - app/dependencies.py
 - app/auth.py
 - app/models.py
+<!-- LINKED CODE FILES END -->
 
 <!-- START: User Authentication Flow -->
 ### 1. User Authentication Flow
 
-*Linked Files:*
+<!-- LINKED CODE FILES START -->
 - app/routes.py (login endpoint)
 - app/auth.py (JWT creation, password verification)
 - app/dependencies.py (token validation)
 - app/models.py (User model)
+<!-- LINKED CODE FILES END -->
 
 *Steps:*
 1. Client sends POST request to /api/v1/auth/login with email and password
@@ -467,11 +478,12 @@ Defines all REST API endpoints using FastAPI routers.
 <!-- START: Item Creation Flow -->
 ### 2. Item Creation Flow
 
-*Linked Files:*
+<!-- LINKED CODE FILES START -->
 - app/routes.py (create_new_item endpoint)
 - app/services.py (create_item function)
 - app/dependencies.py (authentication dependencies)
 - app/models.py (Item, User, Tag models)
+<!-- LINKED CODE FILES END -->
 
 *Steps:*
 1. Client sends POST request to /items with JWT token
@@ -493,10 +505,11 @@ Defines all REST API endpoints using FastAPI routers.
 <!-- START: Item Update Flow -->
 ### 3. Item Update with Change Tracking
 
-*Linked Files:*
+<!-- LINKED CODE FILES START -->
 - app/routes.py (update_existing_item endpoint)
 - app/services.py (update_item function)
 - app/models.py (Item, ActivityLog models)
+<!-- LINKED CODE FILES END -->
 
 *Steps:*
 1. Client sends PUT request to /items/{id} with updates
@@ -516,10 +529,11 @@ Defines all REST API endpoints using FastAPI routers.
 <!-- START: Multi-Tenancy Data Isolation -->
 ### 4. Multi-Tenancy Data Isolation
 
-*Linked Files:*
+<!-- LINKED CODE FILES START -->
 - app/dependencies.py (get_current_organization)
 - app/models.py (Organization, User models)
 - app/services.py (all service functions)
+<!-- LINKED CODE FILES END -->
 
 *Process:*
 1. User authenticates with JWT token
@@ -541,10 +555,11 @@ Defines all REST API endpoints using FastAPI routers.
 <!-- START: Analytics Data Aggregation -->
 ### 5. Analytics Data Aggregation
 
-*Linked Files:*
+<!-- LINKED CODE FILES START -->
 - app/routes.py (analytics endpoints)
 - app/services.py (get_item_analytics, get_usage_analytics)
 - app/models.py (Item, UsageLog models)
+<!-- LINKED CODE FILES END -->
 
 *Steps:*
 1. Client sends GET request to /analytics/items
@@ -574,11 +589,12 @@ Defines all REST API endpoints using FastAPI routers.
 <!-- START: External Dependencies -->
 ## 2.4 External Dependencies
 
-*Linked Files:*
+<!-- LINKED CODE FILES START -->
 - requirements.txt
 - pyproject.toml
 - docker-compose.yml
 - .env.example
+<!-- LINKED CODE FILES END -->
 
 ### Runtime Dependencies
 
