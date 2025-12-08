@@ -16,6 +16,7 @@ Operational notes:
 - Most functions return ORM instances (refreshed) for direct response serialization via Pydantic's orm_mode.
 - Performance: queries use SQLAlchemy aggregates; larger datasets/pagination may need explicit indexing and optimized queries (see Data & Infra pages).
 
+
 ## Source Files
 - app/services.py
 - app/models.py

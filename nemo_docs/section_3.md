@@ -11,11 +11,14 @@ Major endpoint groups:
 - Tags: POST /tags, GET /tags — tagging support.
 - API Keys & Webhooks: Admin-only endpoints for managing API keys (/api-keys) and webhooks (/webhooks).
 - Activity & Analytics: GET /activity, GET /analytics/items, GET /analytics/usage — auditing and operational analytics.
+- Notifications: POST /notifications/due-reminders, POST /notifications/overdue — admin-only reminder/alert dispatch via notification_service.
+- Exports: GET /export/items/csv, GET /export/items/json, GET /export/activity-log/csv — user/org-aware exports returning CSV/JSON responses with appropriate Content-Disposition headers.
+- Reports: GET /reports/team/{team_id}, GET /reports/user/{user_id}, GET /reports/organization — team/user/org reports with RBAC enforced (admins required for org report; user report restricted to owner unless admin).
 
 Important behaviors:
-- Response models: Endpoints return Pydantic schemas (app/schemas.py) for consistent request/response shapes and validation.
-- Auth & RBAC: Endpoints declare dependencies to enforce JWT-based authentication and role checks (require_role) or API key verification.
-- Pagination & filtering: list endpoints support skip/limit and the supported typed filters that map to SQLAlchemy queries in services (team/status/priority/assigned_to only, without the prior title/description text search).
+- Response models: Endpoints return Pydantic schemas (app/schemas.py) for consistent request/response shapes and validation, while export endpoints stream CSV/JSON payloads via Response.
+- Auth & RBAC: Endpoints declare dependencies to enforce JWT-based authentication and role checks (require_role) or API key verification, including admin-only notification/export/report routes.
+- Pagination & filtering: list endpoints support skip/limit and the supported typed filters that map to SQLAlchemy queries in services (team/status/priority/assigned_to only, without the prior title/description text search); export/report filters reuse the same criteria when applicable.
 - Status codes: create operations use 201, deletes use 204, and routes raise HTTPException with appropriate codes on not-found/forbidden/unauthorized.
 
 main.py highlights:
