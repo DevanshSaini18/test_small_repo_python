@@ -16,6 +16,8 @@ Startup behavior:
 - Calls Base.metadata.create_all(bind=engine) to ensure DB tables exist at service start.
 - Includes root and /health endpoints for basic readiness/liveness checks.
 
+Notes on recent route/service updates:
+- Search filtering has been removed from the items listing endpoint and service layer, so list_items now focuses on team, status, priority, and assignee filters only.
 
 ## Source Files
 - main.py
