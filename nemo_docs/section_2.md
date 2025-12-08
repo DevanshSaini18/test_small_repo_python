@@ -4,6 +4,7 @@ app/services.py implements transactional, database-backed operations and higher-
 
 Responsibilities & patterns:
 - CRUD and list operations for Organization, User, Team, Item, Comment, Tag, APIKey, Webhook, and Activity/Usage logs.
+- List/query helpers (e.g. get_items) support common filters such as status, priority and assigned_to, and expose pagination (skip/limit). Note: free-text search on Item.title/Item.description was removed from the get_items service (see Operational notes below).
 - Transactional flow: create -> flush/extend relationships -> commit -> refresh; services take a Session and use domain models rather than raw SQL.
 - Activity logging: log_activity is called by create/update/delete paths to record changes (details often JSON-encoded) for audit and UI feed functionality.
 - Complex updates: update_item handles differential updates for assignees/tags (replacing associations), tracks field changes for activity logs, and sets completed_at when status flips to DONE.
@@ -13,8 +14,11 @@ Responsibilities & patterns:
 Operational notes:
 - Services assume proper authorization and org-scoped checks are enforced by higher-level dependencies/routes.
 - Most functions return ORM instances (refreshed) for direct response serialization via Pydantic's orm_mode.
-- Performance: queries use SQLAlchemy aggregates; larger datasets/pagination may need explicit indexing and optimized queries (see Data & Infra pages).
-
+- get_items signature was simplified: the optional search_text parameter and its ilike-based filtering were removed. Clients that previously relied on that free-text filter must either:
+  - add search logic in a higher layer (API handler), or
+  - use a dedicated search service (recommended for scalable full-text search), or
+  - add a new service that implements DB full-text search with proper indexing.
+- Performance: queries use SQLAlchemy aggregates; larger datasets/pagination may need explicit indexing and optimized queries (see Data & Infra pages). If text search is required at scale, prefer database full-text indices or an external search engine rather than ilike scans.
 
 ## Source Files
 - app/services.py
