@@ -11,11 +11,11 @@ Middleware & behaviors:
 Operational observability & logging:
 - Uses Python logging with INFO level; request middleware logs each request. Services and handlers also raise HTTPException with clear status codes which surface to clients.
 - The code contains TODOs to persist request-level metrics to the DB (log_usage) where the org_id extraction would be required from the auth token.
+- The list items endpoint now relies solely on structured filters (team, status, priority, assignee, paging) and no longer exposes the previous free-text search parameter, simplifying observability updates tied to query characteristics.
 
 Startup behavior:
 - Calls Base.metadata.create_all(bind=engine) to ensure DB tables exist at service start.
 - Includes root and /health endpoints for basic readiness/liveness checks.
-
 
 ## Source Files
 - main.py
