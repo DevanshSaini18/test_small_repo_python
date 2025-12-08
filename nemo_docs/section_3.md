@@ -6,7 +6,7 @@ Major endpoint groups:
 - Authentication: POST /auth/register, POST /auth/login, GET /auth/me — user registration, token issuance (JWT), and user info.
 - Organizations: POST /organizations, GET /organizations/current, GET /organizations/{org_id}/users — create and read tenant info and membership lists.
 - Teams: POST /teams, POST /teams/{team_id}/members/{user_id} — team creation and membership management (Admin only via dependency).
-- Items (tasks): POST /items, GET /items/{item_id}, GET /items (filters: team_id/status/priority/assigned_to/search/skip/limit), PUT /items/{item_id}, DELETE /items/{item_id} — core task lifecycle.
+- Items (tasks): POST /items, GET /items/{item_id}, GET /items (filters: team_id/status/priority/assigned_to/skip/limit), PUT /items/{item_id}, DELETE /items/{item_id} — core task lifecycle. Note: free-text search by title/description has been removed from the list endpoint.
 - Comments: POST /comments, GET /items/{item_id}/comments — commenting on items.
 - Tags: POST /tags, GET /tags — tagging support.
 - API Keys & Webhooks: Admin-only endpoints for managing API keys (/api-keys) and webhooks (/webhooks).
@@ -15,7 +15,7 @@ Major endpoint groups:
 Important behaviors:
 - Response models: Endpoints return Pydantic schemas (app/schemas.py) for consistent request/response shapes and validation.
 - Auth & RBAC: Endpoints declare dependencies to enforce JWT-based authentication and role checks (require_role) or API key verification.
-- Pagination & filtering: list endpoints support skip/limit and a set of typed filters that map to SQLAlchemy queries in services.
+- Pagination & filtering: list endpoints support skip/limit and a set of typed filters (team_id, status, priority, assigned_to) that map to SQLAlchemy queries in services. The previous free-text "search" filter for items (title/description) was removed and is no longer handled in services.get_items.
 - Status codes: create operations use 201, deletes use 204, and routes raise HTTPException with appropriate codes on not-found/forbidden/unauthorized.
 
 main.py highlights:
@@ -23,8 +23,6 @@ main.py highlights:
   - CORS (allow_origins=["*"] by default; production should restrict origins)
   - Request timing middleware that adds X-Process-Time header and logs request method/path/status/time
   - Global exception handler returning 500 with structured logging
-
-
 
 ## Source Files
 - app/routes.py
