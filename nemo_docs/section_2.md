@@ -9,12 +9,12 @@ Responsibilities & patterns:
 - Complex updates: update_item handles differential updates for assignees/tags (replacing associations), tracks field changes for activity logs, and sets completed_at when status flips to DONE.
 - Analytics: get_item_analytics and get_usage_analytics aggregate counts (by status, priority), overdue/completed metrics, average completion time and usage statistics (request counts, endpoints, average response time, error rate).
 - API key & webhook creation: generate_api_key is used to produce secure keys and webhooks persist secrets for signature verification.
+- List retrievals such as get_items now focus on filtering by status, priority, and assignee, without the previous search_text keyword matching.
 
 Operational notes:
 - Services assume proper authorization and org-scoped checks are enforced by higher-level dependencies/routes.
 - Most functions return ORM instances (refreshed) for direct response serialization via Pydantic's orm_mode.
 - Performance: queries use SQLAlchemy aggregates; larger datasets/pagination may need explicit indexing and optimized queries (see Data & Infra pages).
-
 
 ## Source Files
 - app/services.py
