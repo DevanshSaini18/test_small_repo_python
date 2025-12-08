@@ -35,6 +35,8 @@ from app.dependencies import (
     verify_api_key
 )
 from app.auth import verify_password, create_access_token
+from app.notifications import notification_service
+from app.export import export_service
 
 router = APIRouter()
 
@@ -308,3 +310,116 @@ def get_usage_stats(
 ):
     """Get usage analytics (Admin only)."""
     return get_usage_analytics(db, org.id, days)
+
+# ============= Notification Routes =============
+@router.post("/notifications/due-reminders")
+def send_due_reminders(
+    days_before: int = Query(1, ge=1, le=7),
+    current_user: User = Depends(require_role(UserRole.ADMIN)),
+    db: Session = Depends(get_db)
+):
+    """Send due date reminders (Admin only)."""
+    result = notification_service.send_due_date_reminders(db, days_before)
+    return result
+
+@router.post("/notifications/overdue")
+def send_overdue_alerts(
+    current_user: User = Depends(require_role(UserRole.ADMIN)),
+    db: Session = Depends(get_db)
+):
+    """Send overdue item notifications (Admin only)."""
+    result = notification_service.send_overdue_notifications(db)
+    return result
+
+# ============= Export Routes =============
+@router.get("/export/items/csv")
+def export_items_csv(
+    team_id: Optional[int] = Query(None),
+    status: Optional[ItemStatus] = Query(None),
+    priority: Optional[PriorityLevel] = Query(None),
+    current_user: User = Depends(get_current_active_user),
+    org: Organization = Depends(get_current_organization),
+    db: Session = Depends(get_db)
+):
+    """Export items to CSV format."""
+    from fastapi.responses import Response
+    
+    csv_data = export_service.export_items_to_csv(db, org.id, team_id, status, priority)
+    
+    return Response(
+        content=csv_data,
+        media_type="text/csv",
+        headers={"Content-Disposition": f"attachment; filename=items_export_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"}
+    )
+
+@router.get("/export/items/json")
+def export_items_json(
+    team_id: Optional[int] = Query(None),
+    status: Optional[ItemStatus] = Query(None),
+    priority: Optional[PriorityLevel] = Query(None),
+    include_comments: bool = Query(False),
+    current_user: User = Depends(get_current_active_user),
+    org: Organization = Depends(get_current_organization),
+    db: Session = Depends(get_db)
+):
+    """Export items to JSON format."""
+    from fastapi.responses import Response
+    
+    json_data = export_service.export_items_to_json(db, org.id, team_id, status, priority, include_comments)
+    
+    return Response(
+        content=json_data,
+        media_type="application/json",
+        headers={"Content-Disposition": f"attachment; filename=items_export_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"}
+    )
+
+@router.get("/export/activity-log/csv")
+def export_activity_csv(
+    limit: int = Query(1000, ge=1, le=10000),
+    current_user: User = Depends(require_role(UserRole.ADMIN)),
+    org: Organization = Depends(get_current_organization),
+    db: Session = Depends(get_db)
+):
+    """Export activity logs to CSV (Admin only)."""
+    from fastapi.responses import Response
+    
+    csv_data = export_service.export_activity_log_to_csv(db, org.id, limit)
+    
+    return Response(
+        content=csv_data,
+        media_type="text/csv",
+        headers={"Content-Disposition": f"attachment; filename=activity_log_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"}
+    )
+
+# ============= Report Routes =============
+@router.get("/reports/team/{team_id}")
+def get_team_report(
+    team_id: int,
+    current_user: User = Depends(get_current_active_user),
+    db: Session = Depends(get_db)
+):
+    """Get comprehensive team report."""
+    return export_service.generate_team_report(db, team_id)
+
+@router.get("/reports/user/{user_id}")
+def get_user_report(
+    user_id: int,
+    current_user: User = Depends(get_current_active_user),
+    org: Organization = Depends(get_current_organization),
+    db: Session = Depends(get_db)
+):
+    """Get user activity report."""
+    # Users can only view their own report unless they're admin
+    if current_user.id != user_id and current_user.role != UserRole.ADMIN:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+    
+    return export_service.generate_user_report(db, user_id, org.id)
+
+@router.get("/reports/organization")
+def get_organization_report(
+    current_user: User = Depends(require_role(UserRole.ADMIN)),
+    org: Organization = Depends(get_current_organization),
+    db: Session = Depends(get_db)
+):
+    """Get organization summary report (Admin only)."""
+    return export_service.generate_organization_summary(db, org.id)
