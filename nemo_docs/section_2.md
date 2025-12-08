@@ -7,9 +7,9 @@ Responsibilities & patterns:
 - Transactional flow: create -> flush/extend relationships -> commit -> refresh; services take a Session and use domain models rather than raw SQL.
 - Activity logging: log_activity is called by create/update/delete paths to record changes (details often JSON-encoded) for audit and UI feed functionality.
 - Complex updates: update_item handles differential updates for assignees/tags (replacing associations), tracks field changes for activity logs, and sets completed_at when status flips to DONE.
-- Item listing filters now rely on status, priority, and assignee relationships; the previous text search filter in get_items has been removed in favor of scoped attribute/association criteria.
 - Analytics: get_item_analytics and get_usage_analytics aggregate counts (by status, priority), overdue/completed metrics, average completion time and usage statistics (request counts, endpoints, average response time, error rate).
 - API key & webhook creation: generate_api_key is used to produce secure keys and webhooks persist secrets for signature verification.
+- Item listing filters now support an optional search_text parameter that performs case-insensitive matching across titles and descriptions to help narrow results.
 
 Operational notes:
 - Services assume proper authorization and org-scoped checks are enforced by higher-level dependencies/routes.
