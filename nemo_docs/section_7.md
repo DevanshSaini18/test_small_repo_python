@@ -7,7 +7,7 @@ Middleware & behaviors:
 - Request timing: a custom middleware wraps each request to record processing time (ms), logs method/path/status/time and injects X-Process-Time header into responses.
 - Global exception handler: catches unhandled exceptions, logs stack traces, and returns a 500 JSON response.
 - Auto schema/docs: FastAPI docs available at /docs and /redoc per app config.
-- Item listing now accepts an optional search_text query parameter that filters items by title or description via case-insensitive matching.
+- Item listing now relies solely on the various status/priority/assignee filters; the optional search_text query parameter and corresponding case-insensitive title/description filtering have been removed.
 
 Operational observability & logging:
 - Uses Python logging with INFO level; request middleware logs each request. Services and handlers also raise HTTPException with clear status codes which surface to clients.
