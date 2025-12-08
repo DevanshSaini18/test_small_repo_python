@@ -1,23 +1,22 @@
-# Infrastructure & Deployment Notes
+# Application Entrypoint, Middleware & Observability
 
-The repository contains Docker and deployment artifacts and supporting docs to run the application in development and production.
+main.py is the FastAPI application bootstrap that configures middleware, logging, global exception handling, DB creation and mounts the API router.
 
-Key files & responsibilities:
-- docker-compose.yml: orchestration for PostgreSQL (production or dev), application, and Nginx reverse proxy. Configures volumes, health checks, environment variables, ports, and restart policies.
-- Dockerfile: builds a Python 3.11-slim based image (installs system deps, Python deps, copies source, runs uvicorn). Use for containerized deployment.
-- .env.example: template for environment variables (DB URL, SECRET_KEY, CORS, rate limiting, upload paths, logging). Important to fill for production and not keep secrets in source.
-- docs/deployment.md & docs/feature-comparison.md: provide production deployment guidance — SSL termination, scaling notes, monitoring, backups, migrations, and security hardening recommendations.
+Middleware & behaviors:
+- CORS: CORSMiddleware is configured with allow_origins=["*"] (placeholder) — update to explicit origins in production.
+- Request timing: a custom middleware wraps each request to record processing time (ms), logs method/path/status/time and injects X-Process-Time header into responses.
+- Global exception handler: catches unhandled exceptions, logs stack traces, and returns a 500 JSON response.
+- Auto schema/docs: FastAPI docs available at /docs and /redoc per app config.
 
-Production considerations:
-- Replace SQLite with managed Postgres & add Alembic migrations (no migrations implemented currently).
-- Move SECRET_KEY and other secrets to environment / secret manager; do not use runtime-generated secrets in production.
-- Configure CORS, rate limits, and RBAC defaults appropriately; enable request/usage logging into UsageLog for billing/analytics.
-- Add CI pipeline to build images, run tests, run migrations, and push artifacts. Add monitoring/alerting (Prometheus/Grafana, centralized logs) per docs.
+Operational observability & logging:
+- Uses Python logging with INFO level; request middleware logs each request. Services and handlers also raise HTTPException with clear status codes which surface to clients.
+- The code contains TODOs to persist request-level metrics to the DB (log_usage) where the org_id extraction would be required from the auth token.
 
+Startup behavior:
+- Calls Base.metadata.create_all(bind=engine) to ensure DB tables exist at service start.
+- Includes root and /health endpoints for basic readiness/liveness checks.
 
 ## Source Files
-- docker-compose.yml
-- Dockerfile
-- .env.example
-- docs/deployment.md
-- README.md
+- main.py
+- app/routes.py
+- app/services.py

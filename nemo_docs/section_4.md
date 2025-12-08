@@ -1,25 +1,32 @@
-# Authentication & Authorization
+# API Layer & Routing (HTTP Surface)
 
-Security primitives are implemented across app/auth.py and app/dependencies.py to support password-based login, JWT access tokens, API keys, and role-based authorization.
+app/routes.py (mounted at /api/v1 in main.py) exposes the HTTP REST surface and maps incoming requests to service layer operations. main.py wires the router in and configures application-level middleware (CORS, logging, exception handling).
 
-Auth primitives (app/auth.py):
-- Password hashing & verification: passlib CryptContext with bcrypt scheme (get_password_hash, verify_password).
-- JWT tokens: create_access_token and decode_access_token using python-jose with HS256. SECRET_KEY is generated in code for dev (secrets.token_urlsafe) — production must source this from a secure environment variable.
-- API key generation: generate_api_key produces sk_-prefixed secrets using secrets.token_urlsafe.
+Major endpoint groups:
+- Authentication: POST /auth/register, POST /auth/login, GET /auth/me — user registration, token issuance (JWT), and user info.
+- Organizations: POST /organizations, GET /organizations/current, GET /organizations/{org_id}/users — create and read tenant info and membership lists.
+- Teams: POST /teams, POST /teams/{team_id}/members/{user_id} — team creation and membership management (Admin only via dependency).
+- Items (tasks): POST /items, GET /items/{item_id}, GET /items (filters: team_id/status/priority/assigned_to/search_text/skip/limit), PUT /items/{item_id}, DELETE /items/{item_id} — core task lifecycle with service-layer filtering, including search_text which applies an ilike match across titles and descriptions.
+- Comments: POST /comments, GET /items/{item_id}/comments — commenting on items.
+- Tags: POST /tags, GET /tags — tagging support.
+- API Keys & Webhooks: Admin-only endpoints for managing API keys (/api-keys) and webhooks (/webhooks).
+- Activity & Analytics: GET /activity, GET /analytics/items, GET /analytics/usage — auditing and operational analytics.
 
-Dependency layer (app/dependencies.py):
-- HTTPBearer-based token reading: get_current_user decodes JWT, fetches user by id (payload["sub"]), ensures active user, updates last_login timestamp.
-- get_current_active_user / get_current_organization: thin wrappers that enforce active user and active tenant checks.
-- require_role(required_role): factory that enforces role hierarchy (viewer < member < admin < owner) for Admin/Owner-only endpoints.
-- verify_api_key: header-based X-API-KEY check that looks up active APIKey, checks expiration, updates last_used_at and returns organization context.
+Important behaviors:
+- Response models: Endpoints return Pydantic schemas (app/schemas.py) for consistent request/response shapes and validation.
+- Auth & RBAC: Endpoints declare dependencies to enforce JWT-based authentication and role checks (require_role) or API key verification.
+- Pagination & filtering: list endpoints support skip/limit and a set of typed filters that map to SQLAlchemy queries in services, including optional search_text filtering for items to match title/description fragments.
+- Status codes: create operations use 201, deletes use 204, and routes raise HTTPException with appropriate codes on not-found/forbidden/unauthorized.
 
-Security notes:
-- Token expiry is set to 24 hours in code (ACCESS_TOKEN_EXPIRE_MINUTES constant) but is configurable if replaced by env-based settings.
-- Secrets in the code are placeholders; immediate change is required before production (use .env and secrets manager).
-- RBAC is enforced at route-level through dependencies rather than inline checks; this yields composable, testable authorization logic.
-
+main.py highlights:
+- Mounts router at /api/v1, creates DB tables at startup (Base.metadata.create_all), and configures middleware:
+  - CORS (allow_origins=["*"] by default; production should restrict origins)
+  - Request timing middleware that adds X-Process-Time header and logs request method/path/status/time
+  - Global exception handler returning 500 with structured logging
 
 ## Source Files
-- app/auth.py
+- app/routes.py
+- main.py
+- app/services.py
+- app/schemas.py
 - app/dependencies.py
-- app/models.py

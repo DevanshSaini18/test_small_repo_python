@@ -1,32 +1,23 @@
-# API Layer & Routing (HTTP Surface)
+# Service Layer (Business Logic & Data Access)
 
-app/routes.py (mounted at /api/v1 in main.py) exposes the HTTP REST surface and maps incoming requests to service layer operations. main.py wires the router in and configures application-level middleware (CORS, logging, exception handling).
+app/services.py implements transactional, database-backed operations and higher-level business rules on top of the ORM models. It centralizes CRUD operations, activity/usage logging, analytics, and composite behaviors used by API handlers.
 
-Major endpoint groups:
-- Authentication: POST /auth/register, POST /auth/login, GET /auth/me — user registration, token issuance (JWT), and user info.
-- Organizations: POST /organizations, GET /organizations/current, GET /organizations/{org_id}/users — create and read tenant info and membership lists.
-- Teams: POST /teams, POST /teams/{team_id}/members/{user_id} — team creation and membership management (Admin only via dependency).
-- Items (tasks): POST /items, GET /items/{item_id}, GET /items (filters: team_id/status/priority/assigned_to/skip/limit), PUT /items/{item_id}, DELETE /items/{item_id} — core task lifecycle; search-by-text support has been removed in favor of focused identifier-based filters.
-- Comments: POST /comments, GET /items/{item_id}/comments — commenting on items.
-- Tags: POST /tags, GET /tags — tagging support.
-- API Keys & Webhooks: Admin-only endpoints for managing API keys (/api-keys) and webhooks (/webhooks).
-- Activity & Analytics: GET /activity, GET /analytics/items, GET /analytics/usage — auditing and operational analytics.
+Responsibilities & patterns:
+- CRUD and list operations for Organization, User, Team, Item, Comment, Tag, APIKey, Webhook, and Activity/Usage logs.
+- Transactional flow: create -> flush/extend relationships -> commit -> refresh; services take a Session and use domain models rather than raw SQL.
+- Activity logging: log_activity is called by create/update/delete paths to record changes (details often JSON-encoded) for audit and UI feed functionality.
+- Complex updates: update_item handles differential updates for assignees/tags (replacing associations), tracks field changes for activity logs, and sets completed_at when status flips to DONE.
+- Analytics: get_item_analytics and get_usage_analytics aggregate counts (by status, priority), overdue/completed metrics, average completion time and usage statistics (request counts, endpoints, average response time, error rate).
+- API key & webhook creation: generate_api_key is used to produce secure keys and webhooks persist secrets for signature verification.
+- Item listings now support optional search_text filtering, applying case-insensitive matching against titles and descriptions in addition to existing status/priority/assignee filters; this ensures the service can power lightweight search experiences.
 
-Important behaviors:
-- Response models: Endpoints return Pydantic schemas (app/schemas.py) for consistent request/response shapes and validation.
-- Auth & RBAC: Endpoints declare dependencies to enforce JWT-based authentication and role checks (require_role) or API key verification.
-- Pagination & filtering: list endpoints support skip/limit and a set of typed filters that map to SQLAlchemy queries in services.
-- Status codes: create operations use 201, deletes use 204, and routes raise HTTPException with appropriate codes on not-found/forbidden/unauthorized.
-
-main.py highlights:
-- Mounts router at /api/v1, creates DB tables at startup (Base.metadata.create_all), and configures middleware:
-  - CORS (allow_origins=["*"] by default; production should restrict origins)
-  - Request timing middleware that adds X-Process-Time header and logs request method/path/status/time
-  - Global exception handler returning 500 with structured logging
+Operational notes:
+- Services assume proper authorization and org-scoped checks are enforced by higher-level dependencies/routes.
+- Most functions return ORM instances (refreshed) for direct response serialization via Pydantic's orm_mode.
+- Performance: queries use SQLAlchemy aggregates; larger datasets/pagination may need explicit indexing and optimized queries (see Data & Infra pages).
 
 ## Source Files
-- app/routes.py
-- main.py
 - app/services.py
+- app/models.py
+- app/auth.py
 - app/schemas.py
-- app/dependencies.py
