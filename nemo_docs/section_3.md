@@ -6,7 +6,7 @@ Major endpoint groups:
 - Authentication: POST /auth/register, POST /auth/login, GET /auth/me — user registration, token issuance (JWT), and user info.
 - Organizations: POST /organizations, GET /organizations/current, GET /organizations/{org_id}/users — create and read tenant info and membership lists.
 - Teams: POST /teams, POST /teams/{team_id}/members/{user_id} — team creation and membership management (Admin only via dependency).
-- Items (tasks): POST /items, GET /items/{item_id}, GET /items (filters: team_id/status/priority/assigned_to/search/skip/limit), PUT /items/{item_id}, DELETE /items/{item_id} — core task lifecycle.
+- Items (tasks): POST /items, GET /items/{item_id}, GET /items (filters: team_id/status/priority/assigned_to/skip/limit), PUT /items/{item_id}, DELETE /items/{item_id} — core task lifecycle; search-by-text support has been removed in favor of focused identifier-based filters.
 - Comments: POST /comments, GET /items/{item_id}/comments — commenting on items.
 - Tags: POST /tags, GET /tags — tagging support.
 - API Keys & Webhooks: Admin-only endpoints for managing API keys (/api-keys) and webhooks (/webhooks).
@@ -23,8 +23,6 @@ main.py highlights:
   - CORS (allow_origins=["*"] by default; production should restrict origins)
   - Request timing middleware that adds X-Process-Time header and logs request method/path/status/time
   - Global exception handler returning 500 with structured logging
-
-
 
 ## Source Files
 - app/routes.py
