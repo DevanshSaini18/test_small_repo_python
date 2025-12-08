@@ -4,6 +4,7 @@ app/services.py implements transactional, database-backed operations and higher-
 
 Responsibilities & patterns:
 - CRUD and list operations for Organization, User, Team, Item, Comment, Tag, APIKey, Webhook, and Activity/Usage logs.
+- Item listings rely on status, priority, and assignee filters only; the prior free-text search across titles/descriptions has been removed in favor of these explicit filters.
 - Transactional flow: create -> flush/extend relationships -> commit -> refresh; services take a Session and use domain models rather than raw SQL.
 - Activity logging: log_activity is called by create/update/delete paths to record changes (details often JSON-encoded) for audit and UI feed functionality.
 - Complex updates: update_item handles differential updates for assignees/tags (replacing associations), tracks field changes for activity logs, and sets completed_at when status flips to DONE.
@@ -14,7 +15,6 @@ Operational notes:
 - Services assume proper authorization and org-scoped checks are enforced by higher-level dependencies/routes.
 - Most functions return ORM instances (refreshed) for direct response serialization via Pydantic's orm_mode.
 - Performance: queries use SQLAlchemy aggregates; larger datasets/pagination may need explicit indexing and optimized queries (see Data & Infra pages).
-
 
 ## Source Files
 - app/services.py
