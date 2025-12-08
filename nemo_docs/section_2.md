@@ -9,7 +9,7 @@ Responsibilities & patterns:
 - Complex updates: update_item handles differential updates for assignees/tags (replacing associations), tracks field changes for activity logs, and sets completed_at when status flips to DONE.
 - Analytics: get_item_analytics and get_usage_analytics aggregate counts (by status, priority), overdue/completed metrics, average completion time and usage statistics (request counts, endpoints, average response time, error rate).
 - API key & webhook creation: generate_api_key is used to produce secure keys and webhooks persist secrets for signature verification.
-- Item listing filters now support an optional search_text parameter that performs case-insensitive matching across titles and descriptions to help narrow results.
+- Item listing relies on status, priority, and assignee filters, with pagination controls for skip/limit.
 
 Operational notes:
 - Services assume proper authorization and org-scoped checks are enforced by higher-level dependencies/routes.
