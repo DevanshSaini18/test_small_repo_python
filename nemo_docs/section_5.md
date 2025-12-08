@@ -1,17 +1,14 @@
-# Pydantic Schemas (API Contracts)
+# Notification Service (Email Alerts & Reminders)
 
-app/schemas.py contains the request and response models used throughout the API. These Pydantic models define validation, defaulting, and serialization for the HTTP surface.
+app/notifications.py provides NotificationService, which currently logs email delivery flows for item assignments, comments, status changes, and due-date reminders in place of a fully configured SMTP client.
 
-Key characteristics:
-- Pattern: Base -> Create/Update -> Read for most domain entities (Organization, User, Team, Tag, Item, Comment, APIKey, Webhook).
-- orm_mode enabled on Read models so SQLAlchemy ORM instances can be returned directly from routes and serialized into JSON.
-- Typed fields and default values: Enums from app.models are reused (ItemStatus, PriorityLevel, UserRole, SubscriptionTier) to maintain alignment between API and DB layers.
-- Compound & nested shapes: ItemRead contains nested lists of assignees (List[UserRead]) and tags (List[TagRead]) to represent relationships.
-- Analytics shapes: ItemAnalytics and UsageAnalytics provide aggregated response schemas for operational endpoints.
+Capabilities include:
+- send_email: composes multipart plain/text+HTML MIME messages, logs deliveries, and is prepared to use SMTP hosts (default smtp.gmail.com) once enabled.
+- notify_item_assigned / notify_comment_added / notify_status_changed: iterate assignees (excluding the commenter where appropriate) and send templated notifications detailing titles, descriptions, priority, status, and due dates; each returns per-recipient success statuses.
+- send_due_date_reminders: finds items due on a target date (days_before) with non-DONE status, notifies each assignee with a reminder template, and returns aggregated statistics (total_items, notifications sent, successes).
 
 Why it matters:
-These schemas are the explicit API contract; changes here impact backwards compatibility, clients, and documentation (auto-generated via FastAPI docs). They also centralize validations like email formats and datetime typing.
-
+Centralizing notification templates and delivery tracking keeps the reminder and alert endpoints lean, while the same service can later be extended with real SMTP credentials, queueing, or integration with third-party email providers.
 
 ## Source Files
-- app/schemas.py
+- app/notifications.py

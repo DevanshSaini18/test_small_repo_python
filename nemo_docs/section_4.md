@@ -1,25 +1,14 @@
-# Authentication & Authorization
+# Export Service (Reports & Data Exports)
 
-Security primitives are implemented across app/auth.py and app/dependencies.py to support password-based login, JWT access tokens, API keys, and role-based authorization.
+app/export.py defines ExportService, which produces CSV/JSON exports and summary reports consumed by the export and report endpoints described above. The service uses get_items/get_item_analytics to pull org-scoped item data (with skip=0 and limit=10000 safeguards) and serializes related assignees, tags, created_by, and optional comments via the csv and json stdlib helpers.
 
-Auth primitives (app/auth.py):
-- Password hashing & verification: passlib CryptContext with bcrypt scheme (get_password_hash, verify_password).
-- JWT tokens: create_access_token and decode_access_token using python-jose with HS256. SECRET_KEY is generated in code for dev (secrets.token_urlsafe) — production must source this from a secure environment variable.
-- API key generation: generate_api_key produces sk_-prefixed secrets using secrets.token_urlsafe.
+Capabilities include:
+- export_items_to_csv: writes item metadata (status, priority, timestamps, estimates) to a StringIO-backed CSV with flattened assignee/tag lists, suitable for streaming responses.
+- export_items_to_json: builds rich JSON payloads with nested assignees, tags, created_by info, and optional comments, along with export_date and organization metadata.
+- generate_team_report / generate_user_report: compute statistics (completion rates, status/priority breakdowns, overdue counts, member workload, recent activity) for teams and users by querying Team, Item, User, ActivityLog, and aggregating using defaultdict-based counters.
 
-Dependency layer (app/dependencies.py):
-- HTTPBearer-based token reading: get_current_user decodes JWT, fetches user by id (payload["sub"]), ensures active user, updates last_login timestamp.
-- get_current_active_user / get_current_organization: thin wrappers that enforce active user and active tenant checks.
-- require_role(required_role): factory that enforces role hierarchy (viewer < member < admin < owner) for Admin/Owner-only endpoints.
-- verify_api_key: header-based X-API-KEY check that looks up active APIKey, checks expiration, updates last_used_at and returns organization context.
-
-Security notes:
-- Token expiry is set to 24 hours in code (ACCESS_TOKEN_EXPIRE_MINUTES constant) but is configurable if replaced by env-based settings.
-- Secrets in the code are placeholders; immediate change is required before production (use .env and secrets manager).
-- RBAC is enforced at route-level through dependencies rather than inline checks; this yields composable, testable authorization logic.
-
+Why it matters:
+This isolated export service keeps serialization concerns out of the route handlers while ensuring the exported artifact mirrors the core domain model and logged analytics. Reports incorporate calculated insights, so clients have a single place to adjust summaries without touching endpoints.
 
 ## Source Files
-- app/auth.py
-- app/dependencies.py
-- app/models.py
+- app/export.py

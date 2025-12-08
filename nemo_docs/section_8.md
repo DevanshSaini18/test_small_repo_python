@@ -1,23 +1,21 @@
-# Infrastructure & Deployment Notes
+# Database Engine, Sessions & Lifecycle
 
-The repository contains Docker and deployment artifacts and supporting docs to run the application in development and production.
+app/database.py provides the SQLAlchemy engine, SessionLocal factory, and Base declarative class used across the application.
 
-Key files & responsibilities:
-- docker-compose.yml: orchestration for PostgreSQL (production or dev), application, and Nginx reverse proxy. Configures volumes, health checks, environment variables, ports, and restart policies.
-- Dockerfile: builds a Python 3.11-slim based image (installs system deps, Python deps, copies source, runs uvicorn). Use for containerized deployment.
-- .env.example: template for environment variables (DB URL, SECRET_KEY, CORS, rate limiting, upload paths, logging). Important to fill for production and not keep secrets in source.
-- docs/deployment.md & docs/feature-comparison.md: provide production deployment guidance — SSL termination, scaling notes, monitoring, backups, migrations, and security hardening recommendations.
+Contents & usage:
+- Engine: create_engine configured for SQLite by default (sqlite:///./test.db) with connect_args={"check_same_thread": False} to allow multi-threaded access in dev server. Production should replace this URL with a managed RDBMS (Postgres) and use connection pooling settings.
+- SessionLocal: sessionmaker(autocommit=False, autoflush=False, bind=engine) returning scoped Session instances used by get_db dependency.
+- Base: declarative_base used by app/models.py for ORM class definitions.
+- get_db dependency: yields a session per request and ensures closure in a finally block — used widely in route dependencies and services.
 
-Production considerations:
-- Replace SQLite with managed Postgres & add Alembic migrations (no migrations implemented currently).
-- Move SECRET_KEY and other secrets to environment / secret manager; do not use runtime-generated secrets in production.
-- Configure CORS, rate limits, and RBAC defaults appropriately; enable request/usage logging into UsageLog for billing/analytics.
-- Add CI pipeline to build images, run tests, run migrations, and push artifacts. Add monitoring/alerting (Prometheus/Grafana, centralized logs) per docs.
+Operational notes & gaps:
+- No migrations: The project calls Base.metadata.create_all(bind=engine) in main.py to create tables at startup — fine for early development but migrations (Alembic) are required for production schema evolution.
+- Indexes: models define index=True on common lookups but larger scale requires explicit index planning and query profiling.
+- Backups & restore: not implemented inside code; docs/deployment.md references backup strategies. For production, point DB to external service and backup snapshots.
 
 
 ## Source Files
-- docker-compose.yml
-- Dockerfile
-- .env.example
+- app/database.py
+- app/models.py
+- main.py
 - docs/deployment.md
-- README.md

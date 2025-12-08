@@ -9,12 +9,15 @@ Major endpoint groups:
 - Items (tasks): POST /items, GET /items/{item_id}, GET /items (filters: team_id/status/priority/assigned_to/skip/limit), PUT /items/{item_id}, DELETE /items/{item_id} — core task lifecycle, with text-based search removed from the service layer, leaving the remaining filters to map to SQLAlchemy queries.
 - Comments: POST /comments, GET /items/{item_id}/comments — commenting on items.
 - Tags: POST /tags, GET /tags — tagging support.
+- Notifications: POST /notifications/due-reminders, POST /notifications/overdue — admin-triggered reminder and overdue alert dispatch via notification_service.
+- Exports: GET /export/items/csv, GET /export/items/json, GET /export/activity-log/csv — export endpoints that stream CSV/JSON attachments using fastapi.responses.Response and export_service, honoring organization scope, filters (team/status/priority), include_comments flag, and admin-only limits on activity logs.
+- Reports: GET /reports/team/{team_id}, GET /reports/user/{user_id}, GET /reports/organization — report generation APIs backed by export_service, with user-level safeguards (users can only view their own report unless admin) and admin-only organization summaries.
 - API Keys & Webhooks: Admin-only endpoints for managing API keys (/api-keys) and webhooks (/webhooks).
 - Activity & Analytics: GET /activity, GET /analytics/items, GET /analytics/usage — auditing and operational analytics.
 
 Important behaviors:
-- Response models: Endpoints return Pydantic schemas (app/schemas.py) for consistent request/response shapes and validation.
-- Auth & RBAC: Endpoints declare dependencies to enforce JWT-based authentication and role checks (require_role) or API key verification.
+- Response models: Endpoints return Pydantic schemas (app/schemas.py) for consistent request/response shapes and validation, while export/download endpoints return streaming Response objects with appropriate content-disposition headers.
+- Auth & RBAC: Endpoints declare dependencies to enforce JWT-based authentication and role checks (require_role) or API key verification, including new admin-only report/export/notification routes and user-scoped report access.
 - Pagination & filtering: list endpoints support skip/limit and the supported typed filters that map to SQLAlchemy queries in services (team/status/priority/assigned_to only, without the prior title/description text search).
 - Status codes: create operations use 201, deletes use 204, and routes raise HTTPException with appropriate codes on not-found/forbidden/unauthorized.
 

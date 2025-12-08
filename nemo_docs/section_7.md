@@ -8,6 +8,7 @@ Middleware & behaviors:
 - Global exception handler: catches unhandled exceptions, logs stack traces, and returns a 500 JSON response.
 - Auto schema/docs: FastAPI docs available at /docs and /redoc per app config.
 - Item listing now relies solely on the various status/priority/assignee filters; the optional search_text query parameter and corresponding case-insensitive title/description filtering have been removed.
+- Notification, export, and report routes are now registered via the main router, using notification_service for due-date reminders/overdue alerts and export_service for CSV/JSON item exports, activity logs, and team/user/organization reports, with exports streamed as attachment responses and role checks applied where required.
 
 Operational observability & logging:
 - Uses Python logging with INFO level; request middleware logs each request. Services and handlers also raise HTTPException with clear status codes which surface to clients.
