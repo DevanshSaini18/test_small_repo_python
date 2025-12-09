@@ -12,6 +12,7 @@
 - `app/services.py` encapsulates CRUD operations, tagging, commenting, webhook/API-key lifecycle, activity logging, and analytics calculations with SQLAlchemy sessions.
 - Item retrieval honors optional filters (team, status, priority, assignee) plus the new `search_text`, translating it into case-insensitive title/description matches before applying ordering and pagination.
 - Analytics cover status/priority breakdowns, overdue/completion trends, usage stats, and average response/error rates, while `log_activity`/`log_usage` keep audit trails tied to organizations and users.
+- Notification handling now imports `app.notification_services` when available, toggling `NOTIFICATIONS_ENABLED` to trigger `notify_item_created`, `notify_item_updated`, `notify_item_completed`, and `notify_comment_added` during item and comment lifecycle events.
 
 ## Data & Persistence
 - `app/database.py` configures the SQLite engine, session factory, and request-scoped `get_db` generator consumed by FastAPI dependencies.

@@ -15,9 +15,10 @@
 
 ## Service Layer
 - **Organization/User/Team CRUD**: creation helpers ensure password hashing, activity logging, and membership management; team join adds users via secondary table.
-- **Item lifecycle**: `create_item`, `update_item`, `delete_item` manage assignees/tags, enforce org scoping, auto-complete timestamps, and persist audit entries with change diffs; `get_items` also accepts `search_text` to search titles/descriptions alongside status, priority, and assignee filters.
+- **Item lifecycle**: `create_item`, `update_item`, `delete_item` manage assignees/tags, enforce org scoping, auto-complete timestamps, and persist audit entries with change diffs; `get_items` also accepts `search_text` to search titles/descriptions alongside status, priority, and assignee filters while triggering notification hooks (`notify_item_created`, `notify_item_updated`, `notify_item_completed`) when enabled to keep downstream services informed of lifecycle changes.
 - **Comments/Tags/API keys/Webhooks**: existence checks, scoped retrieval, and creation helper routines tied to organization context.
 - **Observability & analytics**: `log_activity` centralizes audits; `get_activity_logs` filters by org/item; `get_item_analytics` aggregates counts by status/priority, overdue/completion metrics, avg completion time; `log_usage`/`get_usage_analytics` capture endpoint usage, average response, error rates.
+- **Notifications**: optional imports from `app.notification_services` guard by `NOTIFICATIONS_ENABLED`, allowing create/update/completion of items and new comments to emit events only when the notification layer is available.
 
 ## Source Files
 - app/models.py

@@ -22,6 +22,10 @@ Supports JWT-backed login/register, RBAC, and API-key verification for the multi
 - `create_api_key` (service + `APIKeyCreate`/`APIKeyRead`) pairs generated secrets with organization, optional expiration, and audit timestamps; `get_api_keys` lists them for Admin users.
 - The `APIKey` model stores `is_active`, `expires_at`, and `last_used_at`; the verification dependency enforces those flags before surfacing the organization to downstream routes.
 
+## Notification integrations
+- `app.services` now attempts to import `notify_item_created`, `notify_item_updated`, `notify_item_completed`, and `notify_comment_added`, setting `NOTIFICATIONS_ENABLED` based on availability so the core auth stack stays decoupled from notification dependencies.
+- When enabled, creating an item, updating it (including marking it done), or adding a comment invokes the respective notification hook, which runs within the authenticated tenant scope already established by the auth/authorization services.
+
 ## Source Files
 - app/auth.py
 - app/routes.py
