@@ -5,10 +5,12 @@
 
 ## API Routing & Access Control
 - `app/routes.py` defines grouped endpoints for auth, organizations, teams, items, comments, tags, API keys, webhooks, activity logs, and analytics, delegating to service functions while enforcing status codes and HTTP errors.
+- Item listing now supports a `search_text` query parameter alongside team/status/priority filters, passing the text through to the service layer for title/description fuzzy search.
 - Dependencies from `app/dependencies.py` inject the current user/organization, enforce RBAC via `require_role`, and validate API keys, ensuring each request carries a properly scoped session and multi-tenant context.
 
 ## Service & Business Logic Layer
 - `app/services.py` encapsulates CRUD operations, tagging, commenting, webhook/API-key lifecycle, activity logging, and analytics calculations with SQLAlchemy sessions.
+- Item retrieval honors optional filters (team, status, priority, assignee) plus the new `search_text`, translating it into case-insensitive title/description matches before applying ordering and pagination.
 - Analytics cover status/priority breakdowns, overdue/completion trends, usage stats, and average response/error rates, while `log_activity`/`log_usage` keep audit trails tied to organizations and users.
 
 ## Data & Persistence

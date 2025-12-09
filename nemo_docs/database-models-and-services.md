@@ -15,10 +15,9 @@
 
 ## Service Layer
 - **Organization/User/Team CRUD**: creation helpers ensure password hashing, activity logging, and membership management; team join adds users via secondary table.
-- **Item lifecycle**: `create_item`, `update_item`, `delete_item` manage assignees/tags, enforce org scoping, auto-complete timestamps, and persist audit entries with change diffs.
+- **Item lifecycle**: `create_item`, `update_item`, `delete_item` manage assignees/tags, enforce org scoping, auto-complete timestamps, and persist audit entries with change diffs; `get_items` also accepts `search_text` to search titles/descriptions alongside status, priority, and assignee filters.
 - **Comments/Tags/API keys/Webhooks**: existence checks, scoped retrieval, and creation helper routines tied to organization context.
 - **Observability & analytics**: `log_activity` centralizes audits; `get_activity_logs` filters by org/item; `get_item_analytics` aggregates counts by status/priority, overdue/completion metrics, avg completion time; `log_usage`/`get_usage_analytics` capture endpoint usage, average response, error rates.
-
 
 ## Source Files
 - app/models.py

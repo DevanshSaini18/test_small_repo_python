@@ -13,15 +13,14 @@ Supports JWT-backed login/register, RBAC, and API-key verification for the multi
 | `GET /auth/me` | Returns the current authenticated user profile. | Guarded by `get_current_active_user`, responds with `UserRead`. |
 
 ## Authorization dependencies
-- `get_current_user` uses `HTTPBearer`, decodes the JWT, looks up the `User`, enforces `is_active`, updates `last_login`, and keeps the organization in scope.
-- `get_current_active_user` and `get_current_organization` ensure actions occur within an active tenant before business logic runs.
+- `get_current_user` uses `HTTPBearer`, decodes the JWT, looks up the `User`, enforces `is_active`, updates `last_login`, and keeps the organization in scope; this organization context ensures queries like the new `search_text` filter applied in `GET /items` remain tenant-scoped.
+- `get_current_active_user` and `get_current_organization` ensure actions occur within an active tenant before business logic (including optional search_text filters) runs.
 - `require_role` compares the `UserRole` hierarchy (`viewer < member < admin < owner`) to gate Admin/Owner APIs.
 - `verify_api_key` reads `X-Api-Key`, confirms the key row is active/unexpired, updates `last_used_at`, and returns the owning `Organization` so API-key calls map to the right tenant.
 
 ## API key lifecycle
 - `create_api_key` (service + `APIKeyCreate`/`APIKeyRead`) pairs generated secrets with organization, optional expiration, and audit timestamps; `get_api_keys` lists them for Admin users.
 - The `APIKey` model stores `is_active`, `expires_at`, and `last_used_at`; the verification dependency enforces those flags before surfacing the organization to downstream routes.
-
 
 ## Source Files
 - app/auth.py
