@@ -9,12 +9,12 @@
 | Area | Key Routes | Notes |
 | --- | --- | --- |
 | Authentication | `/auth/register`, `/auth/login`, `/auth/me` | Creates/logs in users, returns JWT token payloads from `Token` schema. |
-| Organizations | `/organizations`, `/organizations/current`, `/organizations/{id}/users` | Multi-tenant onboarding plus listing org users.
-| Teams | `/teams`, `/teams/{team_id}/members/{user_id}` | Admin-only creation and membership management.
-| Items | `/items`, `/items/{id}`, filters via query params (`team_id`, `status`, `priority`, `assigned_to`, `skip`, `limit`), update/delete APIs | CRUD plus filtering/pagination with RBAC via dependencies.
-| Comments/Tags | `/comments`, `/items/{id}/comments`, `/tags` | Item-scoped comment creation and global tag management.
-| API Keys & Webhooks | `/api-keys`, `/webhooks` | Admin-only key/webhook lifecycle plus event delivery documentation (HMAC-SHA256 signature).
-| Activity & Analytics | `/activity`, `/analytics/items`, `/analytics/usage` | Logs and aggregated metrics (item status/priority breakdown, usage stats).
+| Organizations | `/organizations`, `/organizations/current`, `/organizations/{id}/users` | Multi-tenant onboarding plus listing org users. |
+| Teams | `/teams`, `/teams/{team_id}/members/{user_id}` | Admin-only creation and membership management. |
+| Items | `/items`, `/items/{id}`, filters via query params (`team_id`, `status`, `priority`, `assigned_to`, `search_text`, `skip`, `limit`), update/delete APIs | CRUD plus filtering/pagination with RBAC via dependencies, including optional text search through `search_text`. |
+| Comments/Tags | `/comments`, `/items/{id}/comments`, `/tags` | Item-scoped comment creation and global tag management. |
+| API Keys & Webhooks | `/api-keys`, `/webhooks` | Admin-only key/webhook lifecycle plus event delivery documentation (HMAC-SHA256 signature). |
+| Activity & Analytics | `/activity`, `/analytics/items`, `/analytics/usage` | Logs and aggregated metrics (item status/priority breakdown, usage stats). |
 
 ## Schema Coverage
 - **Organizations:** `OrganizationBase`, `Create`, `Update`, `Read` expose subscription tiers, quotas, activation flags.
