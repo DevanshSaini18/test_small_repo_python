@@ -15,6 +15,16 @@ from app.schemas import (
 )
 from app.auth import get_password_hash, generate_api_key
 
+# Import notification services for automatic triggers
+try:
+    from app.notification_services import (
+        notify_item_created, notify_item_updated, notify_item_completed,
+        notify_comment_added
+    )
+    NOTIFICATIONS_ENABLED = True
+except ImportError:
+    NOTIFICATIONS_ENABLED = False
+
 # ============= Organization Services =============
 def create_organization(db: Session, org: OrganizationCreate) -> Organization:
     """Create a new organization."""
@@ -118,6 +128,10 @@ def create_item(db: Session, item: ItemCreate, org_id: int, user: User) -> Item:
     # Log activity
     log_activity(db, "created", "item", db_item.id, user_id=user.id, item_id=db_item.id)
     
+    # Trigger notifications
+    if NOTIFICATIONS_ENABLED:
+        notify_item_created(db, db_item, user)
+    
     return db_item
 
 def get_item(db: Session, item_id: int, org_id: int) -> Optional[Item]:
@@ -209,6 +223,14 @@ def update_item(db: Session, item_id: int, item_update: ItemUpdate, org_id: int,
             details=json.dumps(changes)
         )
     
+    # Trigger notifications
+    if NOTIFICATIONS_ENABLED and changes:
+        notify_item_updated(db, db_item, user, changes)
+        
+        # Check if item was just completed
+        if "status" in changes and db_item.status == ItemStatus.DONE:
+            notify_item_completed(db, db_item, user)
+    
     return db_item
 
 def delete_item(db: Session, item_id: int, org_id: int, user: User) -> bool:
@@ -241,6 +263,10 @@ def create_comment(db: Session, comment: CommentCreate, user: User, org_id: int)
     db.refresh(db_comment)
     
     log_activity(db, "commented", "item", item.id, user_id=user.id, item_id=item.id)
+    
+    # Trigger notifications
+    if NOTIFICATIONS_ENABLED:
+        notify_comment_added(db, db_comment, item, user)
     
     return db_comment
 
